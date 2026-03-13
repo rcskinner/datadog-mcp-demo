@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: load-generator-v1
+  namespace: demo-mcp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: load-generator-v1
+  template:
+    metadata:
+      labels:
+        app: load-generator-v1
+    spec:
+      containers:
+        - name: load-generator
+          image: curlimages/curl:latest
+          command:
+            - sh
+            - -c
+            - |
+              BASE=http://demo-api-v1:8000
+              i=1
+              while true; do
+                curl -s -X POST $BASE/items \
+                  -H "Content-Type: application/json" \
+                  -d "{\"name\": \"item-$i\"}" > /dev/null
+                curl -s $BASE/items > /dev/null
+                i=$((i + 1))
+                sleep 1
+              done
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: load-generator-v2
+  namespace: demo-mcp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: load-generator-v2
+  template:
+    metadata:
+      labels:
+        app: load-generator-v2
+    spec:
+      containers:
+        - name: load-generator
+          image: curlimages/curl:latest
+          command:
+            - sh
+            - -c
+            - |
+              BASE=http://demo-api-v2:8000
+              i=1
+              while true; do
+                curl -s -X POST $BASE/items \
+                  -H "Content-Type: application/json" \
+                  -d "{\"name\": \"item-$i\"}" > /dev/null
+                curl -s $BASE/items > /dev/null
+                curl -s $BASE/items/fail > /dev/null
+                curl -s $BASE/items/999 > /dev/null
+                i=$((i + 1))
+                sleep 1
+              done

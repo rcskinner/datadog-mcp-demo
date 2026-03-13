@@ -1,11 +1,23 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: demo-api
+  name: demo-api-v1
   namespace: demo-mcp
 spec:
   selector:
-    app: demo-api
+    app: demo-api-v1
+  ports:
+    - port: 8000
+      targetPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-api-v2
+  namespace: demo-mcp
+spec:
+  selector:
+    app: demo-api-v2
   ports:
     - port: 8000
       targetPort: 8000
