@@ -61,6 +61,7 @@ spec:
                   -d "{\"name\": \"item-$i\"}" > /dev/null
                 curl -s $BASE/items > /dev/null
                 curl -s $BASE/items/fail > /dev/null
+                curl -s $BASE/items/stats > /dev/null
                 curl -s $BASE/items/999 > /dev/null
                 i=$((i + 1))
                 sleep 1

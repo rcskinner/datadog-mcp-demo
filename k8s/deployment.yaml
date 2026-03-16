@@ -12,6 +12,9 @@ spec:
     metadata:
       labels:
         app: demo-api-v1
+        tags.datadoghq.com/service: "demo-api"
+        tags.datadoghq.com/env: "prod"
+        tags.datadoghq.com/version: "1.0.0"
       annotations:
         ad.datadoghq.com/demo-api.logs: '[{"source": "python", "service": "demo-api"}]'
     spec:
@@ -39,6 +42,9 @@ spec:
     metadata:
       labels:
         app: demo-api-v2
+        tags.datadoghq.com/service: "demo-api"
+        tags.datadoghq.com/env: "prod"
+        tags.datadoghq.com/version: "2.0.0"
       annotations:
         ad.datadoghq.com/demo-api.logs: '[{"source": "python", "service": "demo-api"}]'
     spec:
