@@ -1,6 +1,5 @@
 import logging
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from src import items, logging_config
 
@@ -8,15 +7,6 @@ logging_config.configure()
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
-
-
-class SimulatedFailureError(Exception):
-    pass
-
-
-@app.exception_handler(SimulatedFailureError)
-async def simulated_failure_handler(request, exc):
-    return JSONResponse(status_code=500, content={"detail": str(exc)})
 
 
 class ItemIn(BaseModel):
@@ -39,10 +29,11 @@ def create_item(body: ItemIn):
     return items.create(body.name)
 
 
-@app.get("/items/fail")
-def fail():
-    logger.error("Simulated failure triggered")
-    raise SimulatedFailureError("Intentional failure endpoint — demo-api v2 error simulation")
+@app.get("/items/stats")
+def get_stats():
+    all_items = items.get_all()
+    avg_price = sum(item["price"] for item in all_items) / len(all_items)
+    return {"count": len(all_items), "avg_price": avg_price}
 
 
 @app.get("/items/{item_id}")
