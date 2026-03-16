@@ -20,3 +20,5 @@ make teardown # delete the demo-mcp namespace
 ## Claude Skills
 
 - `/health-check` — checks deployment health against the configured Datadog instance
+- `/triage` — queries error spans and logs, cross-references source code, and recommends fixes
+- `/compare-versions` — compares v1 and v2 error rates, latency, and throughput to produce a rollout readiness report
