@@ -7,6 +7,7 @@ deploy:
 	kubectl apply -f k8s/namespace.yaml
 	kubectl apply -f k8s/
 	kubectl apply -f k8s/load-generator.yaml
+	kubectl rollout restart deployment -n demo-mcp
 
 load:
 	kubectl apply -f k8s/load-generator.yaml

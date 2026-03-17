@@ -19,6 +19,9 @@ make teardown # delete the demo-mcp namespace
 
 ## Claude Skills
 
+- `/load-mcp-data` — pre-loads all Datadog data into `.claude/snapshot.md`; run this first so other skills use the cache instead of hitting the MCP API on every call
 - `/health-check` — checks deployment health against the configured Datadog instance
 - `/triage` — queries error spans and logs, cross-references source code, and recommends fixes
 - `/compare-versions` — compares v1 and v2 error rates, latency, and throughput to produce a rollout readiness report
+
+> Skills read from the snapshot by default. Pass `--refresh` or re-run `/load-mcp-data` to pull fresh data.
