@@ -39,5 +39,9 @@
 1. Always ask for a review prior to a Git push
 
 
-### Testing: 
-Not super important here it's just a demo sandbox 
+### Testing:
+Not super important here it's just a demo sandbox
+
+### Datadog:
+1. Before making any Datadog MCP calls, check if `.claude/snapshot.md` exists and read it. If it does, use the cached data from that file instead of querying the MCP API.
+2. Only call the Datadog MCP tools if the snapshot does not exist or the user explicitly asks to refresh with `--refresh`.
