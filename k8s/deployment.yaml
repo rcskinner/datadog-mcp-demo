@@ -21,7 +21,7 @@ spec:
       containers:
         - name: demo-api
           image: demo-api:latest
-          imagePullPolicy: Never
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
           envFrom:
@@ -51,7 +51,7 @@ spec:
       containers:
         - name: demo-api
           image: demo-api:latest
-          imagePullPolicy: Never
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
           envFrom:
