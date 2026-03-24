@@ -22,13 +22,41 @@ spec:
             - |
               BASE=http://demo-api-v1:8000
               i=1
+              tick=0
               while true; do
-                curl -s -X POST $BASE/items \
-                  -H "Content-Type: application/json" \
-                  -d "{\"name\": \"item-$i\"}" > /dev/null
-                curl -s $BASE/items > /dev/null
-                i=$((i + 1))
-                sleep 1
+                # 120-tick cycle: quiet -> ramp -> peak -> ramp down
+                phase=$((tick % 120))
+                if [ $phase -lt 30 ]; then
+                  delay=$((1 + RANDOM % 2))
+                  burst=1
+                elif [ $phase -lt 60 ]; then
+                  delay=$((1 + RANDOM % 2))
+                  burst=2
+                elif [ $phase -lt 90 ]; then
+                  delay=$((1 + RANDOM % 2))
+                  burst=5
+                else
+                  delay=$((1 + RANDOM % 2))
+                  burst=2
+                fi
+
+                j=0
+                while [ $j -lt $burst ]; do
+                  # randomly weight toward reads vs writes
+                  r=$((RANDOM % 3))
+                  if [ $r -eq 0 ]; then
+                    curl -s -X POST $BASE/items \
+                      -H "Content-Type: application/json" \
+                      -d "{\"name\": \"item-$i\"}" > /dev/null
+                    i=$((i + 1))
+                  else
+                    curl -s $BASE/items > /dev/null
+                  fi
+                  j=$((j + 1))
+                done
+
+                [ $delay -gt 0 ] && sleep $delay
+                tick=$((tick + 1))
               done
 ---
 apiVersion: apps/v1
@@ -55,14 +83,40 @@ spec:
             - |
               BASE=http://demo-api-v2:8000
               i=1
+              tick=0
               while true; do
-                curl -s -X POST $BASE/items \
-                  -H "Content-Type: application/json" \
-                  -d "{\"name\": \"item-$i\"}" > /dev/null
-                curl -s $BASE/items > /dev/null
-                curl -s $BASE/items/fail > /dev/null
-                curl -s $BASE/items/stats > /dev/null
-                curl -s $BASE/items/999 > /dev/null
-                i=$((i + 1))
-                sleep 1
+                # offset phase by 20 so v2 peak doesn't perfectly overlap v1
+                phase=$(((tick + 20) % 120))
+                if [ $phase -lt 30 ]; then
+                  delay=$((1 + RANDOM % 2))
+                  burst=1
+                elif [ $phase -lt 60 ]; then
+                  delay=$((1 + RANDOM % 2))
+                  burst=2
+                elif [ $phase -lt 90 ]; then
+                  delay=$((1 + RANDOM % 2))
+                  burst=5
+                else
+                  delay=$((1 + RANDOM % 2))
+                  burst=2
+                fi
+
+                j=0
+                while [ $j -lt $burst ]; do
+                  r=$((RANDOM % 5))
+                  case $r in
+                    0) curl -s -X POST $BASE/items \
+                         -H "Content-Type: application/json" \
+                         -d "{\"name\": \"item-$i\"}" > /dev/null
+                       i=$((i + 1)) ;;
+                    1) curl -s $BASE/items > /dev/null ;;
+                    2) curl -s $BASE/items/stats > /dev/null ;;
+                    3) curl -s $BASE/items/$((RANDOM % 50 + 1)) > /dev/null ;;
+                    4) curl -s $BASE/items/999 > /dev/null ;;
+                  esac
+                  j=$((j + 1))
+                done
+
+                [ $delay -gt 0 ] && sleep $delay
+                tick=$((tick + 1))
               done
